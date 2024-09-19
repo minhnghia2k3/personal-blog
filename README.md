@@ -43,9 +43,20 @@ It also includes robust security, monitoring, and deployment functionalities.
 
 ## API Endpoints
 
+### System
 | Method     | Endpoint                      | Description                                             |
 |------------|-------------------------------|---------------------------------------------------------|
 | **GET**    | `/healthcheck`                | Check application health status.                        |
+
+### Info
+| Method     | Endpoint                      | Description                                             |
+|------------|-------------------------------|---------------------------------------------------------|
+| **GET**    | `/`                           | View the homepage with top blogs.                       |
+| **GET**    | `/me`                         | View the information of the author.                     |
+
+### Users
+| Method     | Endpoint                      | Description                                             |
+|------------|-------------------------------|---------------------------------------------------------|
 | **GET**    | `/user/signup`                | View sign-up form.                                      |
 | **POST**   | `/user/signup`                | Register a new user account.                            |
 | **GET**    | `/user/login`                 | View login form.                                        |
@@ -56,8 +67,10 @@ It also includes robust security, monitoring, and deployment functionalities.
 | **GET**    | `/user/google_login`          | Redirect to Google authentication URL.                  |
 | **POST**   | `/user/google_login`          | Log in using Google OAuth.                              |
 | **POST**   | `/user/google_callback`       | Handle Google OAuth callback.                           |
-| **GET**    | `/`                           | View the homepage with top blogs.                       |
-| **GET**    | `/me`                         | View the information of the author.                     |
+
+### Blogs
+| Method     | Endpoint                      | Description                                             |
+|------------|-------------------------------|---------------------------------------------------------|
 | **GET**    | `/blogs`                      | Fetch all blogs (supports pagination, filtering).       |
 | **GET**    | `/blogs/{title}/{id}`         | View a specific blog by title and ID.                   |
 | **GET**    | `/blogs/create`               | View create blog form.                                  |
@@ -65,18 +78,34 @@ It also includes robust security, monitoring, and deployment functionalities.
 | **GET**    | `/blogs/update/{id}`          | View update blog form.                                  |
 | **PATCH**  | `/blogs/update/{id}`          | Partially update a blog (save draft to `blog_history`). |
 | **DELETE** | `/blogs/delete/{id}`          | Delete a blog and related images (CASCADE).             |
+
+### Comments
+| Method     | Endpoint                      | Description                                             |
+|------------|-------------------------------|---------------------------------------------------------|
 | **GET**    | `/comments/{id}/blogs`        | Fetch all comments on a blog.                           |
 | **POST**   | `/comments/create/{id}/blogs` | Post a comment on a blog.                               |
 | **PATCH**  | `/comments/update/{id}`       | Update a comment.                                       |
 | **DELETE** | `/comments/delete/{id}`       | Delete a comment.                                       |
+
+### Likes
+| Method     | Endpoint                      | Description                                             |
+|------------|-------------------------------|---------------------------------------------------------|
 | **GET**    | `/likes/{id}/blogs`           | Fetch all likes on a blog.                              |
 | **POST**   | `/likes/add/{id}/blogs`       | Like a blog post.                                       |
 | **DELETE** | `/likes/delete/{id}/blogs`    | Unlike a blog post.                                     |
+
+### Categories
+| Method     | Endpoint                      | Description                                             |
+|------------|-------------------------------|---------------------------------------------------------|
 | **GET**    | `/categories`                 | Fetch all categories.                                   |
 | **GET**    | `/categories/{id}`            | Fetch a specific category by ID.                        |
 | **POST**   | `/categories`                 | Create a new category.                                  |
 | **PATCH**  | `/categories/{id}`            | Update a category.                                      |
 | **DELETE** | `/categories/{id}`            | Delete a category.                                      |
+
+### Images
+| Method     | Endpoint                      | Description                                             |
+|------------|-------------------------------|---------------------------------------------------------|
 | **POST**   | `/images/create`              | Upload an image (local or cloud).                       |
 | **GET**    | `/images/{name}`              | View an image.                                          |
 | **DELETE** | `/images/delete/{id}`         | Delete an image.                                        |

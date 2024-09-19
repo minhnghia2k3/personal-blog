@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/minhnghia2k3/personal-blog/cmd/config"
+	"github.com/minhnghia2k3/personal-blog/internal/config"
 	"net/http"
 )
 

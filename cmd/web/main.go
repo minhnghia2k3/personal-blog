@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/minhnghia2k3/personal-blog/cmd/config"
+	"github.com/minhnghia2k3/personal-blog/internal/config"
 	"github.com/minhnghia2k3/personal-blog/internal/routes"
 )
 

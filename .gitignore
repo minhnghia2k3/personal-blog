@@ -73,11 +73,14 @@ config/apple_config_files
 
 # Enviroment files
 envs/
-main
 .idea
+.env
+
+# Build files
+./bin/*
+
 pgdata
 vendor
 coverage.txt
 tempo-data
 tempo-data/*
-.env

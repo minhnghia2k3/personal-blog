@@ -128,8 +128,9 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 - [x] Project setup 
 - [x] Create file structure
 - [x] Setup Git version control
+- [x] Setup Go server on local & first healthcheck handler
+- [x] Setup Building, Versioning
 - [ ] Logging
-- [ ] Setup Go server on local & first healthcheck handler
 - [ ] Setup Postgres database
 - [ ] SQL migrations
 - [ ] User model
@@ -138,14 +139,10 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 - [ ] Store image on cloud service
 - [ ] User activation
 - [ ] Role-based authorization
-- [ ] Handlers
-- [ ] Routes
-- [ ] Config
 - [ ] Rate limiting
 - [ ] Graceful shutdown
 - [ ] CORS
 - [ ] Metrics
-- [ ] Building, Versioning
 
 ## License
 This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) - see the LICENSE file for details.

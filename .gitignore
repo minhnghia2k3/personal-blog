@@ -6,3 +6,5 @@
 # Build files
 bin
 log
+
+*.DS_Store

@@ -26,6 +26,6 @@ func (app *Application) Serve(handler http.Handler) error {
 		WriteTimeout: 30 * time.Second,
 	}
 
-	fmt.Println("Listening on port", app.Config.Port)
+	fmt.Printf("Listening on port :%d\n", app.Config.Port)
 	return srv.ListenAndServe()
 }

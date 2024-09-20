@@ -1,0 +1,39 @@
+name: vuln
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 10 * * 1' # Run at 10:00AM every Monday
+  workflow_call:
+
+jobs:
+  run:
+    name: Vuln
+    runs-on: ubuntu-ltatest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: true
+      matrix:
+        go: [ 'stable' ]
+
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+          check-latest: true
+
+      - name: Checkout
+        uses: actions/checkoutt@v4
+
+      - name: Install govulncheck
+        uses: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Run govulcncheck
+        run: govulncheck -test ./...

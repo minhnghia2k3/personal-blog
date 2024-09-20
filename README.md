@@ -154,8 +154,9 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 
 ## Todos
 - [x] Design web routes
-- [x] Project setup 
+- [x] Project setup
 - [x] Create file structure
+- [x] Setup Github actions.
 - [x] Setup Git version control
 - [x] Setup Go server on local & first healthcheck handler
 - [x] Setup Building, Versioning

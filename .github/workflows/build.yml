@@ -14,7 +14,7 @@ on:
   workflow_call:
     inputs:
       skipTests:
-        description: 'Skip tests, useful when there is a dediactewd CI job for the tests'
+        description: 'Skip tests, useful when there is a dedicated CI job for the tests'
         default: true
         required: false
         type: boolean

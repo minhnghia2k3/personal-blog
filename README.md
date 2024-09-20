@@ -162,17 +162,17 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 - [x] Setup Building, Versioning
 - [x] Logging
 - [x] Setup Postgres database
-- [ ] SQL migrations
-- [ ] User model
+- [x] SQL migrations
 - [ ] Blog model...
 - [ ] Email service
 - [ ] Store image on cloud service
-- [ ] User activation
-- [ ] Role-based authorization
 - [ ] Rate limiting
 - [ ] Graceful shutdown
 - [ ] CORS
 - [ ] Metrics
+- [ ] User activation
+- [ ] User model
+- [ ] Role-based authorization
 
 ## License
 This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) - see the LICENSE file for details.

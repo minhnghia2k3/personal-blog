@@ -1,8 +1,11 @@
+include .env
+
 MODULE = $(shell go list -m)
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || echo "1.0.0")
 PACKAGES := $(shell go list ./... | grep -v /vendor/)
 LDFLAGS := -ldflags "-X ${MODULE}/internal/config.Version=${VERSION}"
 GOARCH := $(shell go env GOARCH)
+MIGRATION_PATH = internal/database/migrations
 
 
 default: help
@@ -98,3 +101,20 @@ deps-cleancache: ## clean the go modules cache
 	go clean -modcache
 
 # ==============================================================================
+# Database migration
+.PHONY: migrate.create
+migrate.create:
+	migrate create -ext=sql -dir=$(MIGRATION_PATH) -seq $(NAME)
+
+.PHONY: migrate.up
+migrate.up:
+	migrate -database $(DATABASE_URL) -path $(MIGRATION_PATH) up
+
+.PHONY: migrate.down
+migrate.down:
+	migrate -database $(DATABASE_URL) -path $(MIGRATION_PATH) down
+
+.PHONY: migrate.force
+migrate.force:
+	migrate -database $(DATABASE_URL) -path $(MIGRATION_PATH) force $(VERSION)
+

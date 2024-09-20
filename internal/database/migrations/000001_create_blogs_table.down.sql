@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS blog_history;
+DROP TABLE IF EXISTS blogs;
+DROP TABLE IF EXISTS blog_categories;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS images;

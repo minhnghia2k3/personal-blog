@@ -35,12 +35,15 @@ jobs:
 
       - name: Install Go
         uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+          check-latest: true
 
       - name: Go mod verify
-        uses: go mod verify
+        run: go mod verify
 
       - name: Go format
-        uses: gofmt -s -w . && git diff --exit-code
+        run: gofmt -s -w . && git diff --exit-code
 
       - name: Go Vet
         run: go vet ./...
@@ -54,12 +57,5 @@ jobs:
       - name: Go Generate
         run: go generate ./... && git diff --exit-code
 
-      - name: Go build
-        run: Go build -o /dev/null ./...
-
-
-
-
-
-
-
+      - name: Go Build
+        run: go build -o /dev/null ./...

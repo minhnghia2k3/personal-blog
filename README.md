@@ -159,7 +159,7 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 - [x] Setup Git version control
 - [x] Setup Go server on local & first healthcheck handler
 - [x] Setup Building, Versioning
-- [ ] Logging
+- [x] Logging
 - [ ] Setup Postgres database
 - [ ] SQL migrations
 - [ ] User model

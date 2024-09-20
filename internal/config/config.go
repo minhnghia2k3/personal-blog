@@ -20,11 +20,13 @@ func Load() *Config {
 		log.Fatal(err)
 	}
 
+	// Load env data
 	port, err := strconv.Atoi(os.Getenv("APP_PORT"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	env := os.Getenv("APP_ENV")
+
 	return &Config{
 		Port: port,
 		Env:  env,

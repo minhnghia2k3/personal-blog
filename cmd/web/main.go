@@ -20,7 +20,6 @@ func main() {
 		slog.Error(err.Error())
 		return
 	}
-	defer consoleLog.CloseLogger()
 
 	// Initialize application
 	app := internal.NewApplication(cfg)

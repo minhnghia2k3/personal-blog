@@ -55,7 +55,10 @@ func (h *ImageHandler) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	response, _ := json.Marshal(map[string]string{"location": filename})
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(response)
+	_, err = w.Write(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // ServeImages serve image directory as static files.

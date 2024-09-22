@@ -8,6 +8,10 @@ import (
 	"net/http"
 )
 
+type constant string
+
+const ArticleConstant constant = "article"
+
 type Middleware struct {
 	articleService *services.ArticleService
 }
@@ -46,7 +50,7 @@ func (m *Middleware) ArticleCtx(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "article", article)
+		ctx := context.WithValue(r.Context(), ArticleConstant, article)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -13,6 +13,10 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{DB: db}
 }
 
+func handleError(query *sql.Stmt) {
+	_ = query.Close()
+}
+
 func (r *Repository) GetAll() ([]*models.Article, error) {
 	var articles []*models.Article
 	stmt := `SELECT id, title, content, min_read, created_at, updated_at
@@ -21,13 +25,15 @@ FROM articles`
 	if err != nil {
 		return nil, err
 	}
-	defer query.Close()
+	defer handleError(query)
 
 	rows, err := query.Query()
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		_ = rows.Close()
+	}(rows)
 	for rows.Next() {
 		var article models.Article
 		err = rows.Scan(&article.ID, &article.Title, &article.Content, &article.MinRead, &article.CreatedAt, &article.UpdatedAt)
@@ -47,7 +53,7 @@ func (r *Repository) GetByID(articleID string) (*models.Article, error) {
 FROM articles WHERE id = $1`
 
 	query, err := r.DB.Prepare(stmt)
-	defer query.Close()
+	defer handleError(query)
 
 	if err != nil {
 		return nil, err
@@ -86,7 +92,7 @@ WHERE id = $5`
 	if err != nil {
 		return err
 	}
-	defer query.Close()
+	defer handleError(query)
 
 	_, err = query.Exec(article.Title, article.Content, article.MinRead, article.UpdatedAt, articleID)
 	if err != nil {
@@ -102,7 +108,7 @@ func (r *Repository) Delete(articleID string) error {
 	if err != nil {
 		return err
 	}
-	defer query.Close()
+	defer handleError(query)
 
 	_, err = query.Exec(articleID)
 	if err != nil {

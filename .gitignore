@@ -8,3 +8,6 @@ bin
 log
 
 *.DS_Store
+
+# Image files
+images

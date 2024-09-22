@@ -1,4 +1,4 @@
-<img height="250" src="./ui/assets/golang.png" width="250"/>
+<img height="250" src="ui/static/img/golang.png" width="250"/>
 
 # Personal Blog
 

@@ -1,43 +1,41 @@
 package main
 
 import (
-	"github.com/minhnghia2k3/personal-blog/internal"
-	"github.com/minhnghia2k3/personal-blog/internal/config"
+	"fmt"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/minhnghia2k3/personal-blog/internal/database"
-	"github.com/minhnghia2k3/personal-blog/internal/logger"
+	"github.com/minhnghia2k3/personal-blog/internal/handlers"
+	"github.com/minhnghia2k3/personal-blog/internal/helpers"
+	"github.com/minhnghia2k3/personal-blog/internal/repositories"
 	"github.com/minhnghia2k3/personal-blog/internal/routes"
-	"log/slog"
+	"github.com/minhnghia2k3/personal-blog/internal/services"
+	"net/http"
 )
 
 func main() {
-	// Load config
-	cfg := config.Load()
+	var err error
 
-	// Initialize logger
-	consoleLog := logger.ConsoleLogger{}
-	err := consoleLog.NewLogger(slog.LevelInfo)
-	if err != nil {
-		slog.Error(err.Error())
-		return
-	}
+	// Load env
+	err = godotenv.Load()
+	helpers.Catch(err)
 
-	// Initialize application
-	app := internal.NewApplication(cfg)
-
-	// Initialize routes
-	r := routes.Routes()
-
-	// Connect database
-	db, err := database.ConnectDB(cfg)
-	if err != nil {
-		slog.Error(err.Error())
-		return
-	}
+	db, err := database.ConnectDB()
+	helpers.Catch(err)
 	defer db.Close()
 
-	// Serve HTTP Server
-	err = app.Serve(r)
-	if err != nil {
-		slog.Error(err.Error())
-	}
+	// Initialize repositories, services, and handlers
+	articleRepo := repositories.NewRepository(db)
+	articleService := services.NewArticleService(articleRepo)
+	articleHandler := handlers.NewArticleHandler(articleService)
+
+	// Initialize Image handlers
+	imageHandler := handlers.NewImageHandler()
+
+	// Initialize router
+	router := routes.Routes(articleHandler, imageHandler)
+
+	fmt.Println("Server running on port :8080")
+	err = http.ListenAndServe(":8080", router)
+	helpers.Catch(err)
 }

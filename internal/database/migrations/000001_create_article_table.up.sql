@@ -14,7 +14,7 @@ CREATE TABLE "articles"
     "views"      INT                   DEFAULT 0,
     "min_read"   INT          NOT NULL,
     "created_at" TIMESTAMP    NOT NULL DEFAULT (now()),
-    "updated_at" timestamp    NOT NULL DEFAULT (now())
+    "updated_at" TIMESTAMP    NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE article_images

@@ -1,119 +1,26 @@
 package repositories
 
 import (
-	"database/sql"
 	"github.com/minhnghia2k3/personal-blog/internal/models"
 )
 
-type Repository struct {
-	DB *sql.DB
+type ArticleRepository interface {
+	GetAll() ([]*models.Article, error)
+	GetByID(articleID string) (*models.Article, error)
+	Create(article *models.Article) (*models.Article, error)
+	Update(articleID string, article *models.Article) error
+	Delete(articleID string) error
+
+	AddCategory(articleID, categoryID string) error
+	RemoveCategory(articleID, categoryID string) error
+	GetCategoriesByArticle(articleID string) ([]*models.Category, error)
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{DB: db}
-}
-
-func handleError(query *sql.Stmt) {
-	_ = query.Close()
-}
-
-func (r *Repository) GetAll() ([]*models.Article, error) {
-	var articles []*models.Article
-	stmt := `SELECT id, title, content, min_read, created_at, updated_at
-FROM articles`
-	query, err := r.DB.Prepare(stmt)
-	if err != nil {
-		return nil, err
-	}
-	defer handleError(query)
-
-	rows, err := query.Query()
-	if err != nil {
-		return nil, err
-	}
-	defer func(rows *sql.Rows) {
-		_ = rows.Close()
-	}(rows)
-	for rows.Next() {
-		var article models.Article
-		err = rows.Scan(&article.ID, &article.Title, &article.Content, &article.MinRead, &article.CreatedAt, &article.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-
-		articles = append(articles, &article)
-	}
-
-	return articles, nil
-}
-
-func (r *Repository) GetByID(articleID string) (*models.Article, error) {
-	var article models.Article
-	stmt := `SELECT id, title, content, min_read, created_at, updated_at
-FROM articles WHERE id = $1`
-
-	query, err := r.DB.Prepare(stmt)
-	defer handleError(query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	row := query.QueryRow(articleID)
-	err = row.Scan(&article.ID, &article.Title, &article.Content, &article.MinRead, &article.CreatedAt, &article.UpdatedAt)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &article, nil
-}
-
-func (r *Repository) Create(article *models.Article) error {
-	stmt := `INSERT INTO articles(title, content, min_read, created_at)
-VALUES($1, $2, $3, $4)`
-	query, err := r.DB.Prepare(stmt)
-	if err != nil {
-		return err
-	}
-
-	_, err = query.Exec(article.Title, article.Content, article.MinRead, article.CreatedAt)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Repository) Update(articleID string, article *models.Article) error {
-	stmt := `UPDATE articles SET title = $1, content = $2, min_read = $3, updated_at = $4
-WHERE id = $5`
-	query, err := r.DB.Prepare(stmt)
-
-	if err != nil {
-		return err
-	}
-	defer handleError(query)
-
-	_, err = query.Exec(article.Title, article.Content, article.MinRead, article.UpdatedAt, articleID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Repository) Delete(articleID string) error {
-	stmt := `DELETE FROM articles WHERE id = $1`
-	query, err := r.DB.Prepare(stmt)
-
-	if err != nil {
-		return err
-	}
-	defer handleError(query)
-
-	_, err = query.Exec(articleID)
-	if err != nil {
-		return err
-	}
-
-	return nil
+type CategoryRepository interface {
+	GetAll() ([]*models.Category, error)
+	GetByID(categoryID string) (*models.Category, error)
+	GetByName(name string) (*models.Category, error)
+	Create(category *models.Category) error
+	Update(categoryID string, category *models.Category) error
+	Delete(categoryID string) error
 }

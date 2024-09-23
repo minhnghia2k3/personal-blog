@@ -1,0 +1,9 @@
+{{define "title"}}Create category{{end}}
+{{define "scripts"}}{{end}}
+{{define "body"}}
+<h1>Create category</h1>
+<form action="/categories" method="POST">
+    <label for="name">Name:</label><br>
+    <input id="name" type="text" name="name" placeholder="Enter category name..."/>
+</form>
+{{end}}

@@ -6,20 +6,19 @@ import (
 	"github.com/minhnghia2k3/personal-blog/internal/middlewares"
 )
 
-func RegisterArticleRoutes(r chi.Router, handler *handlers.ArticleHandler) {
-	m := middlewares.New(handler.Service)
-
-	r.Get("/", handler.GetAllArticles)
+func RegisterArticleRoutes(r chi.Router, articleHandler *handlers.ArticleHandler, categoryHandler *handlers.CategoryHandlers) {
+	m := middlewares.New(articleHandler.Service, categoryHandler.Service)
 
 	r.Route("/articles", func(r chi.Router) {
-		r.Get("/", handler.NewArticle)
-		r.Post("/", handler.CreateArticle)
+		r.Use(m.CategoriesCtx)
+		r.Get("/", articleHandler.NewArticle)
+		r.Post("/", articleHandler.CreateArticle)
 		r.Route("/{articleID}", func(r chi.Router) {
 			r.Use(m.ArticleCtx)
-			r.Get("/", handler.GetArticle)
-			r.Put("/", handler.UpdateArticle)
-			r.Delete("/", handler.DeleteArticle)
-			r.Get("/edit", handler.EditArticle)
+			r.Get("/", articleHandler.GetArticle)
+			r.Put("/", articleHandler.UpdateArticle)
+			r.Delete("/", articleHandler.DeleteArticle)
+			r.Get("/edit", articleHandler.EditArticle)
 		})
 	})
 }

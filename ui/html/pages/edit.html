@@ -18,10 +18,18 @@
 </script>
 {{end}}
 {{define "body"}}
-<form method="post" action="/articles/{{.ID}}">
-    <input type="text" name="title" value="{{.Title}}">
-    <input id="min_read" type="number" name="min_read" value="{{.MinRead}}">
-    <textarea id="mytextarea" name="content">{{.Content}}</textarea>
+<form method="post" action="/articles/{{.Article.ID}}">
+    <input type="text" name="title" value="{{.Article.Title}}">
+    <label for="categories">Choose a category:</label>
+    <select id="categories" name="categories" class="tag-select chzn-done" multiple="">
+        {{range .ListCategories}}
+        <option value="{{.Name}}">
+                {{.Name}}
+        </option>
+        {{end}}
+    </select>
+    <input id="min_read" type="number" name="min_read" value="{{.Article.MinRead}}">
+    <textarea id="mytextarea" name="content">{{.Article.Content}}</textarea>
     <input type="hidden" name="_method" value="PUT">
     <button id="submit" type="submit" onclick="submitForm()">Edit</button>
 </form>

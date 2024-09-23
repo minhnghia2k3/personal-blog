@@ -24,16 +24,21 @@ func main() {
 	helpers.Catch(err)
 	defer db.Close()
 
+	// Initialize Categories module
+	categoryRepo := repositories.NewPostgresCategoryRepository(db)
+	categoryService := services.NewCategoryService(categoryRepo)
+	categoryHandler := handlers.NewCategoryHandlers(categoryService)
+
 	// Initialize repositories, services, and handlers
-	articleRepo := repositories.NewRepository(db)
-	articleService := services.NewArticleService(articleRepo)
-	articleHandler := handlers.NewArticleHandler(articleService)
+	articleRepo := repositories.NewPostgresArticleRepository(db)
+	articleService := services.NewArticleService(articleRepo, categoryRepo)
+	articleHandler := handlers.NewArticleHandler(articleService, categoryService)
 
 	// Initialize Image handlers
 	imageHandler := handlers.NewImageHandler()
 
 	// Initialize router
-	router := routes.Routes(articleHandler, imageHandler)
+	router := routes.Routes(articleHandler, categoryHandler, imageHandler)
 
 	fmt.Println("Server running on port :8080")
 	err = http.ListenAndServe(":8080", router)

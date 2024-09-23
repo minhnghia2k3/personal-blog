@@ -1,5 +1,6 @@
 {{define "title"}}Create article{{end}}
 {{define "scripts"}}
+<script src="/static/static/js/MultiSelect.js"></script>
 <script src="https://cdn.tiny.cloud/1/85fe0x3jcmbx53xg5wpbn3bn3hv09f8dx9latszmokopyjnt/tinymce/7/tinymce.min.js"
         referrerpolicy="origin"></script>
 <script>
@@ -19,8 +20,19 @@
 {{end}}
 {{define "body"}}
 <form method="post" action="/articles">
-    <input id="title" type="text" name="title" placeholder="Enter the title">
+    <input id="title" type="text" name="title" placeholder="Enter the title"><br>
+
+
+    <label for="categories">Choose a category:</label>
+    <select id="categories" name="categories" class="tag-select chzn-done" multiple="">
+        {{if eq (len .) 0}}There is nothing here...{{end}}
+        {{range .}}
+        <option value="{{.Name}}">{{.Name}}</option>
+        {{end}}
+    </select>
+
     <input id="min_read" type="number" name="min_read" placeholder="Enter the min read in minute...">
+
     <textarea id="mytextarea" name="content"></textarea>
     <button id="submit" type="submit">Create</button>
 </form>

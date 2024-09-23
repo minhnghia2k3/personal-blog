@@ -2,22 +2,26 @@ package middlewares
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/minhnghia2k3/personal-blog/internal/helpers"
 	"github.com/minhnghia2k3/personal-blog/internal/services"
 	"net/http"
 )
 
 type constant string
 
-const ArticleConstant constant = "article"
+const (
+	ArticleConstant    constant = "article"
+	CategoriesConstant constant = "categories"
+)
 
 type Middleware struct {
-	articleService *services.ArticleService
+	articleService  *services.ArticleService
+	categoryService *services.CategoryService
 }
 
-func New(articleService *services.ArticleService) *Middleware {
-	return &Middleware{articleService}
+func New(articleService *services.ArticleService, categoryService *services.CategoryService) *Middleware {
+	return &Middleware{articleService, categoryService}
 }
 
 // =========================== Middlewares ===========================
@@ -45,12 +49,19 @@ func (m *Middleware) ArticleCtx(next http.Handler) http.Handler {
 
 		// Fetch article from database
 		article, err := m.articleService.GetArticleById(articleID)
-		if err != nil {
-			fmt.Println(err)
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
+		helpers.HttpCatch(w, err)
+
 		ctx := context.WithValue(r.Context(), ArticleConstant, article)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (m *Middleware) CategoriesCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		categories, err := m.categoryService.ListCategories()
+		helpers.HttpCatch(w, err)
+
+		ctx := context.WithValue(r.Context(), CategoriesConstant, categories)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

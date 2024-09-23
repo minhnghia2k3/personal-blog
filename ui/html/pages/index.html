@@ -1,15 +1,22 @@
 {{define "title"}}All articles{{end}}
 {{define "scripts"}}{{end}}
 {{define "body"}}
-{{if eq (len .) 0}}
+{{if eq (len .ArticleCategories) 0}}
 Nothing to see here...
 {{end}}
-{{range .}}
+{{range .ArticleCategories}}
 <div>
-    <a href="/articles/{{.ID}}">{{.Title}}</a>
+    <a href="/articles/{{.Article.ID}}">{{.Article.Title}}</a>
+
+    {{range .Categories}}
+    <p>{{.Name}} </p>
+    {{end}}
 </div>
 {{end}}
 <p>
-    <a href="/articles">Create</a>
+    <a href="/articles">Create article</a>
+</p>
+<p>
+    <a href="/categories">Create category</a>
 </p>
 {{end}}

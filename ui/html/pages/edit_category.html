@@ -1,0 +1,10 @@
+{{define "title"}}{{end}}
+{{define "scripts"}}{{end}}
+{{define "body"}}
+<h1>Edit category</h1>
+<form action="/categories/{{.ID}}" method="POST">
+    <label for="name">Name:</label><br>
+    <input id="name" type="text" name="name" value="{{.Name}}"/>
+    <button id="submit" type="submit">Edit</button>
+</form>
+{{end}}

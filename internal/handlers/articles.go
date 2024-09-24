@@ -18,35 +18,23 @@ type ArticleHandler struct {
 	CategoryService *services.CategoryService
 }
 
-type ArticlesPageData struct {
-	ArticleCategories []*models.ArticleCategories
-}
-
 func NewArticleHandler(service *services.ArticleService, categoryService *services.CategoryService) *ArticleHandler {
-	return &ArticleHandler{Service: service, CategoryService: categoryService}
+	return &ArticleHandler{
+		Service:         service,
+		CategoryService: categoryService}
 }
 
 // GetAllArticles will fetch all articles in database and render to the template.
 func (h *ArticleHandler) GetAllArticles(w http.ResponseWriter, r *http.Request) {
-	var articleCategories []*models.ArticleCategories
-	articles, err := h.Service.GetArticleList()
+	// Get query parameters
+	p := helpers.GetPaginationValues(r)
+
+	response, err := h.Service.GetArticleList(p)
 	helpers.HttpCatch(w, err)
 
-	for _, article := range articles {
-		categories, err := h.Service.GetCategoryList(strconv.Itoa(article.ID))
-		if err != nil {
-			helpers.HttpCatch(w, err)
-			return
-		}
-
-		articleCategories = append(articleCategories, &models.ArticleCategories{
-			Article:    article,
-			Categories: categories,
-		})
-	}
-	pageData := ArticlesPageData{articleCategories}
+	// Execute data to template
 	t, _ := template.ParseFiles("ui/html/base.html", "ui/html/pages/index.html")
-	err = t.Execute(w, pageData)
+	err = t.Execute(w, response)
 	helpers.HttpCatch(w, err)
 }
 

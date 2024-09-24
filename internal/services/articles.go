@@ -1,11 +1,13 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"github.com/minhnghia2k3/personal-blog/internal/dto"
 	"github.com/minhnghia2k3/personal-blog/internal/helpers"
 	"github.com/minhnghia2k3/personal-blog/internal/models"
 	"github.com/minhnghia2k3/personal-blog/internal/repositories"
+	"log"
 	"strconv"
 	"time"
 )
@@ -20,9 +22,41 @@ func NewArticleService(repo repositories.ArticleRepository, categoryRepo reposit
 }
 
 // GetArticleList will fetch all articles from the database.
-func (s *ArticleService) GetArticleList() ([]*models.Article, error) {
-	return s.repo.GetAll()
+func (s *ArticleService) GetArticleList(p dto.Pagination) (*dto.ArticleCategoriesResponse, error) {
+	var articleCategories []*models.ArticleCategories
 
+	// Calculate offset
+	offset := (p.Page - 1) * p.Limit
+	p.Offset = offset
+
+	// Get article list
+	articles, err := s.repo.GetAll(p)
+	if err != nil {
+		log.Printf("Failed to get articles from database: %v", err)
+		return nil, errors.New("failed to get articles")
+	}
+
+	// Get article categories
+	for _, article := range articles.Article {
+		categories, err := s.repo.GetCategoriesByArticle(strconv.Itoa(article.ID))
+		if err != nil {
+			log.Printf("Failed to get categories from database: %v", err)
+			return nil, fmt.Errorf("failed to get categories by article")
+		}
+
+		articleCategories = append(articleCategories, &models.ArticleCategories{
+			Article:    article,
+			Categories: categories,
+		})
+	}
+
+	// Prepare response data
+	response := &dto.ArticleCategoriesResponse{
+		ArticleCategories: articleCategories,
+		Metadata:          articles.Metadata,
+	}
+
+	return response, nil
 }
 
 // GetArticleById will fetch article by ID.

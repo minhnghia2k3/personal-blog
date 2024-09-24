@@ -164,6 +164,7 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 - [x] Setup Postgres database
 - [x] SQL migrations
 - [x] Article model...
+- [x] Pagination for articles
 - [ ] Email service
 - [ ] Store image on cloud service
 - [ ] Rate limiting

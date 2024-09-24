@@ -2,7 +2,9 @@ package repositories
 
 import (
 	"database/sql"
+	"github.com/minhnghia2k3/personal-blog/internal/dto"
 	"github.com/minhnghia2k3/personal-blog/internal/models"
+	"math"
 )
 
 type PostgresArticleRepository struct {
@@ -19,22 +21,47 @@ func handleError(query *sql.Stmt) {
 	}
 }
 
-func (r *PostgresArticleRepository) GetAll() ([]*models.Article, error) {
+func (r *PostgresArticleRepository) GetAll(p dto.Pagination) (*dto.ArticleResponse, error) {
 	var articles []*models.Article
+	var totalCount int
+
 	stmt := `SELECT id, title, content, min_read, created_at, updated_at FROM articles`
+
+	countStmt := `SELECT COUNT(*) FROM articles`
+
+	var params []interface{}
+	params = append(params, p.Limit, p.Offset)
+
+	if p.Search != "" {
+		p.Search = "%" + p.Search + "%"
+		stmt += ` WHERE(title ILIKE $3 OR content ILIKE $3)`
+		params = append(params, p.Search)
+	}
+
+	stmt += ` ORDER BY created_at desc LIMIT $1 OFFSET $2`
+
+	// Get total records
+	err := r.DB.QueryRow(countStmt).Scan(&totalCount)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the paginated articles
 	query, err := r.DB.Prepare(stmt)
 	if err != nil {
 		return nil, err
 	}
 	defer handleError(query)
 
-	rows, err := query.Query()
+	rows, err := query.Query(params...)
 	if err != nil {
 		return nil, err
 	}
 	defer func(rows *sql.Rows) {
 		_ = rows.Close()
 	}(rows)
+
+	// Process article rows
 	for rows.Next() {
 		var article models.Article
 		err = rows.Scan(&article.ID, &article.Title, &article.Content, &article.MinRead, &article.CreatedAt, &article.UpdatedAt)
@@ -45,7 +72,21 @@ func (r *PostgresArticleRepository) GetAll() ([]*models.Article, error) {
 		articles = append(articles, &article)
 	}
 
-	return articles, nil
+	// Calculate total pages
+	totalPages := int(math.Ceil(float64(totalCount) / float64(p.Limit)))
+
+	// Prepare response with metadata
+	response := &dto.ArticleResponse{
+		Article: articles,
+		Metadata: dto.Metadata{
+			TotalCount:  totalCount,
+			CurrentPage: p.Page,
+			PageSize:    p.Limit,
+			TotalPages:  totalPages,
+		},
+	}
+
+	return response, nil
 }
 
 func (r *PostgresArticleRepository) GetByID(articleID string) (*models.Article, error) {

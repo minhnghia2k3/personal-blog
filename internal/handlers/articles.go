@@ -53,8 +53,16 @@ func (h *ArticleHandler) GetAllArticles(w http.ResponseWriter, r *http.Request) 
 // GetArticle get article information and render to the template.
 func (h *ArticleHandler) GetArticle(w http.ResponseWriter, r *http.Request) {
 	article := r.Context().Value(middlewares.ArticleConstant).(*models.Article)
+	categories, err := h.Service.GetCategoryList(strconv.Itoa(article.ID))
+	helpers.HttpCatch(w, err)
+
+	articleCategories := &models.ArticleCategories{
+		Article:    article,
+		Categories: categories,
+	}
+
 	t, _ := template.ParseFiles("ui/html/base.html", "ui/html/pages/article.html")
-	err := t.Execute(w, article)
+	err = t.Execute(w, articleCategories)
 	helpers.HttpCatch(w, err)
 }
 

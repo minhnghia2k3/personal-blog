@@ -54,45 +54,16 @@ It also includes robust security, monitoring, and deployment functionalities.
 | **GET**    | `/`                           | View the homepage with top blogs.                       |
 | **GET**    | `/me`                         | View the information of the author.                     |
 
-### Users
+### Articles
 | Method     | Endpoint                      | Description                                             |
 |------------|-------------------------------|---------------------------------------------------------|
-| **GET**    | `/user/signup`                | View sign-up form.                                      |
-| **POST**   | `/user/signup`                | Register a new user account.                            |
-| **GET**    | `/user/login`                 | View login form.                                        |
-| **POST**   | `/user/login`                 | Log in to the user account.                             |
-| **POST**   | `/user/logout`                | Log out the current user.                               |
-| **GET**    | `/user/forgot-password`       | View forgot password form.                              |
-| **POST**   | `/user/forgot-password`       | Reset password.                                         |
-| **GET**    | `/user/google_login`          | Redirect to Google authentication URL.                  |
-| **POST**   | `/user/google_login`          | Log in using Google OAuth.                              |
-| **POST**   | `/user/google_callback`       | Handle Google OAuth callback.                           |
-
-### Blogs
-| Method     | Endpoint                      | Description                                             |
-|------------|-------------------------------|---------------------------------------------------------|
-| **GET**    | `/blogs`                      | Fetch all blogs (supports pagination, filtering).       |
-| **GET**    | `/blogs/{title}/{id}`         | View a specific blog by title and ID.                   |
-| **GET**    | `/blogs/create`               | View create blog form.                                  |
-| **POST**   | `/blogs/create`               | Submit a new blog.                                      |
-| **GET**    | `/blogs/update/{id}`          | View update blog form.                                  |
-| **PATCH**  | `/blogs/update/{id}`          | Partially update a blog (save draft to `blog_history`). |
-| **DELETE** | `/blogs/delete/{id}`          | Delete a blog and related images (CASCADE).             |
-
-### Comments
-| Method     | Endpoint                      | Description                                             |
-|------------|-------------------------------|---------------------------------------------------------|
-| **GET**    | `/comments/{id}/blogs`        | Fetch all comments on a blog.                           |
-| **POST**   | `/comments/create/{id}/blogs` | Post a comment on a blog.                               |
-| **PATCH**  | `/comments/update/{id}`       | Update a comment.                                       |
-| **DELETE** | `/comments/delete/{id}`       | Delete a comment.                                       |
-
-### Likes
-| Method     | Endpoint                      | Description                                             |
-|------------|-------------------------------|---------------------------------------------------------|
-| **GET**    | `/likes/{id}/blogs`           | Fetch all likes on a blog.                              |
-| **POST**   | `/likes/add/{id}/blogs`       | Like a blog post.                                       |
-| **DELETE** | `/likes/delete/{id}/blogs`    | Unlike a blog post.                                     |
+| **GET**    | `/articles`                   | Fetch all blogs (supports pagination, filtering).       |
+| **GET**    | `/articles/{title}/{id}`      | View a specific blog by title and ID.                   |
+| **GET**    | `/articles/create`            | View create blog form.                                  |
+| **POST**   | `/articles/create`            | Submit a new blog.                                      |
+| **GET**    | `/articles/update/{id}`       | View update blog form.                                  |
+| **PATCH**  | `/articles/update/{id}`       | Partially update a blog (save draft to `blog_history`). |
+| **DELETE** | `/articles/delete/{id}`       | Delete a blog and related images (CASCADE).             |
 
 ### Categories
 | Method     | Endpoint                      | Description                                             |
@@ -165,6 +136,9 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 - [x] SQL migrations
 - [x] Article model...
 - [x] Pagination for articles
+- [ ] Validate input from create/update actions
+- [ ] Enhance logging
+- [ ] Add styles
 - [ ] Email service
 - [ ] Store image on cloud service
 - [ ] Rate limiting

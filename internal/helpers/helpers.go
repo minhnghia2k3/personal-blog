@@ -1,9 +1,7 @@
 package helpers
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"github.com/minhnghia2k3/personal-blog/internal/dto"
 	"github.com/minhnghia2k3/personal-blog/internal/models"
 	"log"
@@ -99,7 +97,7 @@ func ValidateStruct(obj interface{}) (errs []error) {
 // ResponseErrors utility to return validation errors as JSON
 func ResponseErrors(w http.ResponseWriter, errs []error) {
 	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"errors": errs,
 	})
 }

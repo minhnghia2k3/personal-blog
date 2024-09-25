@@ -49,7 +49,7 @@ func (m *Middleware) ArticleCtx(next http.Handler) http.Handler {
 
 		// Fetch article from database
 		article, err := m.articleService.GetArticleById(articleID)
-		helpers.HttpCatch(w, err)
+		helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 		ctx := context.WithValue(r.Context(), ArticleConstant, article)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -59,7 +59,7 @@ func (m *Middleware) ArticleCtx(next http.Handler) http.Handler {
 func (m *Middleware) CategoriesCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		categories, err := m.categoryService.ListCategories()
-		helpers.HttpCatch(w, err)
+		helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 		ctx := context.WithValue(r.Context(), CategoriesConstant, categories)
 		next.ServeHTTP(w, r.WithContext(ctx))

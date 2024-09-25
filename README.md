@@ -136,7 +136,7 @@ The application integrates Prometheus for monitoring key metrics. You can view t
 - [x] SQL migrations
 - [x] Article model...
 - [x] Pagination for articles
-- [ ] Validate input from create/update actions
+- [x] Validate input from create/update actions
 - [ ] Enhance logging
 - [ ] Add styles
 - [ ] Email service

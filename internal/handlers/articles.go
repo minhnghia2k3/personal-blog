@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	_ "github.com/go-playground/validator/v10"
 	"github.com/minhnghia2k3/personal-blog/internal/dto"
 	"github.com/minhnghia2k3/personal-blog/internal/helpers"
 	"github.com/minhnghia2k3/personal-blog/internal/middlewares"
@@ -30,19 +31,19 @@ func (h *ArticleHandler) GetAllArticles(w http.ResponseWriter, r *http.Request) 
 	p := helpers.GetPaginationValues(r)
 
 	response, err := h.Service.GetArticleList(p)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	// Execute data to template
 	t, _ := template.ParseFiles("ui/html/base.html", "ui/html/pages/index.html")
 	err = t.Execute(w, response)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 }
 
 // GetArticle get article information and render to the template.
 func (h *ArticleHandler) GetArticle(w http.ResponseWriter, r *http.Request) {
 	article := r.Context().Value(middlewares.ArticleConstant).(*models.Article)
 	categories, err := h.Service.GetCategoryList(strconv.Itoa(article.ID))
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	articleCategories := &models.ArticleCategories{
 		Article:    article,
@@ -51,7 +52,7 @@ func (h *ArticleHandler) GetArticle(w http.ResponseWriter, r *http.Request) {
 
 	t, _ := template.ParseFiles("ui/html/base.html", "ui/html/pages/article.html")
 	err = t.Execute(w, articleCategories)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 }
 
 // NewArticle will render create article form with categories data for multiple select.
@@ -59,16 +60,18 @@ func (h *ArticleHandler) NewArticle(w http.ResponseWriter, r *http.Request) {
 	categories := r.Context().Value(middlewares.CategoriesConstant).([]*models.Category)
 	t, _ := template.ParseFiles("ui/html/base.html", "ui/html/pages/create_article.html")
 	err := t.Execute(w, categories)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 }
 
-// CreateArticle is an action for creating new article. Will redirect to homepage If successfully.
+// CreateArticle action will parse form values, validate it and pass to the article service.
 func (h *ArticleHandler) CreateArticle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	// Parse from value
 	title := r.FormValue("title")
 	content := r.FormValue("content")
-	minRead, err := strconv.Atoi(r.FormValue("min_read"))
-	helpers.HttpCatch(w, err)
+	minRead, err := helpers.FormIntValue(r, "min_read")
+	helpers.HttpCatch(w, http.StatusBadRequest, err)
 	categoryNames := r.Form["categories"]
 
 	// Create new article
@@ -81,9 +84,19 @@ func (h *ArticleHandler) CreateArticle(w http.ResponseWriter, r *http.Request) {
 		},
 		CategoriesName: categoryNames,
 	}
-	err = h.Service.CreateArticle(article)
-	helpers.HttpCatch(w, err)
 
+	// Validate article struct
+	errs := helpers.ValidateStruct(article)
+	if errs != nil {
+		helpers.ResponseErrors(w, errs)
+		return
+	}
+
+	// Call the service to create the article
+	err = h.Service.CreateArticle(article)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
+
+	// Redirect on success
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
@@ -99,18 +112,21 @@ func (h *ArticleHandler) EditArticle(w http.ResponseWriter, r *http.Request) {
 
 	t, _ := template.ParseFiles("ui/html/base.html", "ui/html/pages/edit.html")
 	err := t.Execute(w, articleCategories)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 }
 
 // UpdateArticle is a function for updating an article.
 func (h *ArticleHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get article from request context
 	article := r.Context().Value(middlewares.ArticleConstant).(*models.Article)
 
 	title := r.FormValue("title")
 	content := r.FormValue("content")
-	minRead, err := strconv.Atoi(r.FormValue("min_read"))
-	helpers.HttpCatch(w, err)
 	categoryNames := r.Form["categories"]
+	minRead, err := helpers.FormIntValue(r, "min_read")
+	helpers.HttpCatch(w, http.StatusBadRequest, err)
 
 	// Create new article_categories
 	newArticle := &dto.EditArticle{
@@ -122,8 +138,17 @@ func (h *ArticleHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
 		},
 		CategoriesName: categoryNames,
 	}
+
+	// Validate form values
+	errs := helpers.ValidateStruct(newArticle)
+	if errs != nil {
+		helpers.ResponseErrors(w, errs)
+		return
+	}
+
+	// Call update service
 	err = h.Service.UpdateArticle(strconv.Itoa(article.ID), newArticle)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	http.Redirect(w, r, fmt.Sprintf("/articles/%d", article.ID), http.StatusFound)
 }
@@ -132,7 +157,7 @@ func (h *ArticleHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
 func (h *ArticleHandler) DeleteArticle(w http.ResponseWriter, r *http.Request) {
 	article := r.Context().Value(middlewares.ArticleConstant).(*models.Article)
 	err := h.Service.DeleteArticle(strconv.Itoa(article.ID))
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	http.Redirect(w, r, "/", http.StatusOK)
 }

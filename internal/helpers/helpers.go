@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/minhnghia2k3/personal-blog/internal/dto"
 	"github.com/minhnghia2k3/personal-blog/internal/models"
 	"log"
@@ -17,10 +19,10 @@ func Catch(err error) {
 	}
 }
 
-func HttpCatch(w http.ResponseWriter, err error) {
+func HttpCatch(w http.ResponseWriter, status int, err error) {
 	if err != nil {
 		log.Println("HTTP Error:", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(status), status)
 		return
 	}
 }
@@ -63,4 +65,49 @@ func GetPaginationValues(r *http.Request) dto.Pagination {
 		Search: search,
 	}
 
+}
+
+type validationError struct {
+	Field       string      `json:"field"`
+	Tag         string      `json:"tag"`
+	ActualValue interface{} `json:"actual_value"`
+}
+
+func (v validationError) Error() string {
+	return fmt.Sprintf("Field '%s' failed on '%s' validation, got '%v'", v.Field, v.Tag, v.ActualValue)
+}
+
+func ValidateStruct(obj interface{}) (errs []error) {
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err := validate.Struct(obj)
+	if err != nil {
+		for _, vErr := range err.(validator.ValidationErrors) {
+			e := validationError{
+				Field:       vErr.StructField(),
+				Tag:         vErr.Tag(),
+				ActualValue: vErr.Value(),
+			}
+
+			errs = append(errs, e)
+		}
+		return errs
+	}
+
+	return nil
+}
+
+// ResponseErrors utility to return validation errors as JSON
+func ResponseErrors(w http.ResponseWriter, errs []error) {
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"errors": errs,
+	})
+}
+
+func FormIntValue(r *http.Request, name string) (int, error) {
+	val, err := strconv.Atoi(r.FormValue("min_read"))
+	if err != nil {
+		return -1, err
+	}
+	return val, nil
 }

@@ -20,6 +20,7 @@ func NewCategoryHandlers(service *services.CategoryService) *CategoryHandlers {
 
 // CreateCategory handler that create new category.
 func (h *CategoryHandlers) CreateCategory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	name := r.FormValue("name")
 
 	category := &models.Category{
@@ -27,31 +28,48 @@ func (h *CategoryHandlers) CreateCategory(w http.ResponseWriter, r *http.Request
 		CreatedAt: time.Now(),
 	}
 
+	errs := helpers.ValidateStruct(category)
+	if errs != nil {
+		helpers.ResponseErrors(w, errs)
+		return
+	}
+
 	err := h.Service.CreateCategory(category)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 // UpdateCategory handler that update a category.
 func (h *CategoryHandlers) UpdateCategory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	categoryID := chi.URLParam(r, "id")
 	name := r.FormValue("name")
 
 	category := &models.Category{
 		Name: name,
 	}
+
+	errs := helpers.ValidateStruct(category)
+	if errs != nil {
+		helpers.ResponseErrors(w, errs)
+		return
+	}
+
 	err := h.Service.UpdateCategory(categoryID, category)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 // DeleteCategory handler that delete a category.
 func (h *CategoryHandlers) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	categoryID := chi.URLParam(r, "id")
 	err := h.Service.DeleteCategory(categoryID)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	http.Redirect(w, r, "/", http.StatusOK)
 }
@@ -59,21 +77,21 @@ func (h *CategoryHandlers) DeleteCategory(w http.ResponseWriter, r *http.Request
 // NewCategory will parse and render create category form.
 func (h *CategoryHandlers) NewCategory(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("./ui/html/base.html", "./ui/html/pages/create_category.html")
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	err = tmpl.Execute(w, nil)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 }
 
 // EditCategory will parse and render edit category form with its value.
 func (h *CategoryHandlers) EditCategory(w http.ResponseWriter, r *http.Request) {
 	categoryID := chi.URLParam(r, "id")
 	category, err := h.Service.GetCategoryByID(categoryID)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	tmpl, err := template.ParseFiles("./ui/html/base.html", "./ui/html/pages/edit_category.html")
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 
 	err = tmpl.Execute(w, category)
-	helpers.HttpCatch(w, err)
+	helpers.HttpCatch(w, http.StatusInternalServerError, err)
 }

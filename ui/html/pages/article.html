@@ -2,6 +2,7 @@
 {{define "scripts"}}{{end}}
 {{define "body"}}
 <h1>{{.Article.Title}}</h1>
+<p>{{.Article.MinRead}} min read</p>
 <div>{{.Article.Content}}</div>
 <div>
     {{ range .Categories}}

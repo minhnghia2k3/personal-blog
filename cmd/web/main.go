@@ -1,16 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/minhnghia2k3/personal-blog/internal"
+	"github.com/minhnghia2k3/personal-blog/internal/config"
 	"github.com/minhnghia2k3/personal-blog/internal/database"
 	"github.com/minhnghia2k3/personal-blog/internal/handlers"
 	"github.com/minhnghia2k3/personal-blog/internal/helpers"
 	"github.com/minhnghia2k3/personal-blog/internal/repositories"
 	"github.com/minhnghia2k3/personal-blog/internal/routes"
 	"github.com/minhnghia2k3/personal-blog/internal/services"
-	"net/http"
+	"log"
 )
 
 func main() {
@@ -20,6 +21,11 @@ func main() {
 	err = godotenv.Load()
 	helpers.Catch(err)
 
+	// Load app config
+	cfg := config.Load()
+	app := internal.NewApplication(cfg)
+
+	// Load db connection pool
 	db, err := database.ConnectDB()
 	helpers.Catch(err)
 	defer db.Close()
@@ -40,7 +46,6 @@ func main() {
 	// Initialize router
 	router := routes.Routes(articleHandler, categoryHandler, imageHandler)
 
-	fmt.Println("Server running on port :8080")
-	err = http.ListenAndServe(":8080", router)
-	helpers.Catch(err)
+	// Serve server
+	log.Fatal(app.Serve(router))
 }

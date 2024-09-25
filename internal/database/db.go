@@ -4,18 +4,24 @@ import (
 	"context"
 	"database/sql"
 	_ "github.com/lib/pq"
-	"github.com/minhnghia2k3/personal-blog/internal/config"
 	"os"
 	"strconv"
 	"time"
 )
+
+type dbConfig struct {
+	Dsn                string
+	MaxOpenConnections int
+	MaxIdleConnections int
+	MaxIdleTime        string
+}
 
 // ConnectDB connects to the dsn and using provided config
 func ConnectDB() (*sql.DB, error) {
 	maxIdleConnections, _ := strconv.Atoi(os.Getenv("MAX_IDLE_CONNECTIONS"))
 	maxOpenConnections, _ := strconv.Atoi(os.Getenv("MAX_OPEN_CONNECTIONS"))
 
-	cfg := config.DBConfig{
+	cfg := dbConfig{
 		Dsn:                os.Getenv("DATABASE_URL"),
 		MaxOpenConnections: maxIdleConnections,
 		MaxIdleConnections: maxOpenConnections,

@@ -8,6 +8,7 @@ import (
 	"github.com/minhnghia2k3/personal-blog/internal/database"
 	"github.com/minhnghia2k3/personal-blog/internal/handlers"
 	"github.com/minhnghia2k3/personal-blog/internal/helpers"
+	"github.com/minhnghia2k3/personal-blog/internal/logger"
 	"github.com/minhnghia2k3/personal-blog/internal/repositories"
 	"github.com/minhnghia2k3/personal-blog/internal/routes"
 	"github.com/minhnghia2k3/personal-blog/internal/services"
@@ -19,7 +20,11 @@ func main() {
 
 	// Load env
 	err = godotenv.Load()
-	helpers.Catch(err)
+	helpers.MustCatch(err)
+
+	// Initialize logger
+	l := logger.New()
+	l.DefaultLog()
 
 	// Load app config
 	cfg := config.Load()
@@ -27,7 +32,7 @@ func main() {
 
 	// Load db connection pool
 	db, err := database.ConnectDB()
-	helpers.Catch(err)
+	helpers.MustCatch(err)
 	defer db.Close()
 
 	// Initialize Categories module

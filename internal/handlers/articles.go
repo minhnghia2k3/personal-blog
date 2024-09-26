@@ -71,7 +71,13 @@ func (h *ArticleHandler) CreateArticle(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	content := r.FormValue("content")
 	minRead, err := helpers.FormIntValue(r, "min_read")
-	helpers.HttpCatch(w, http.StatusBadRequest, err)
+	if err != nil {
+		helpers.Respond(w, helpers.Response{
+			StatusCode: http.StatusBadRequest,
+			Msg:        "min_read must be a number",
+		})
+		return
+	}
 	categoryNames := r.Form["categories"]
 
 	// Create new article

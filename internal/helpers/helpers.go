@@ -1,25 +1,27 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/minhnghia2k3/personal-blog/internal/dto"
 	"github.com/minhnghia2k3/personal-blog/internal/models"
-	"log"
+	"log/slog"
 	"net/http"
 	"strconv"
 )
 
-// Catch catches error occurred
-func Catch(err error) {
+// MustCatch catches and panic exception
+func MustCatch(err error) {
 	if err != nil {
-		fmt.Println(err)
+		slog.Error("Internal Server Error", "status", http.StatusInternalServerError, "error", err)
 		panic(err)
 	}
 }
 
 func HttpCatch(w http.ResponseWriter, status int, err error) {
 	if err != nil {
-		log.Println("HTTP Error:", err)
+		slog.Debug("HTTP Error:", "error", err)
 		http.Error(w, http.StatusText(status), status)
 		return
 	}
@@ -102,10 +104,28 @@ func ResponseErrors(w http.ResponseWriter, errs []error) {
 	})
 }
 
+// FormIntValue parse form value to integer type.
 func FormIntValue(r *http.Request, name string) (int, error) {
 	val, err := strconv.Atoi(r.FormValue("min_read"))
 	if err != nil {
 		return -1, err
 	}
 	return val, nil
+}
+
+type Response struct {
+	StatusCode int
+	Msg        string
+}
+
+func Respond(w http.ResponseWriter, r Response) {
+	_, err := json.Marshal(r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, err.Error())
+		return
+	}
+
+	w.WriteHeader(r.StatusCode)
+	fmt.Fprintf(w, r.Msg)
 }

@@ -5,53 +5,31 @@ import (
 	"os"
 )
 
-type Logger interface {
-	NewLogger(level slog.Level) error
-	CloseLogger() error
+type JSONLogger struct {
 }
 
-// ConsoleLogger logs to standard output
-type ConsoleLogger struct{}
-
-// FileLogger logs to specified log file
-type FileLogger struct {
-	logFile *os.File
+func New() *JSONLogger {
+	return &JSONLogger{}
 }
 
-// NewLogger initialize console logger that log to standard output
-func (l *ConsoleLogger) NewLogger(level slog.Level) error {
-	logLevel := new(slog.LevelVar)
-	logger := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})
-	slog.SetDefault(slog.New(logger))
-	logLevel.Set(level)
-	return nil
-}
+func (l *JSONLogger) DefaultLog() {
+	appEnv := os.Getenv("APP_ENV")
 
-// NewLogger initialize file logger that log to specific log file
-func (l *FileLogger) NewLogger(level slog.Level) error {
-	var err error
-	l.logFile, err = os.OpenFile(os.Getenv("LOG_FILE"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
+	level := &slog.LevelVar{}
+
+	opts := &slog.HandlerOptions{
+		Level: level,
 	}
 
-	var logLevel = new(slog.LevelVar)
-	logger := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})
-	slog.SetDefault(slog.New(logger))
+	handler := slog.NewJSONHandler(os.Stdout, opts)
 
-	logLevel.Set(level)
-	return nil
-}
-
-// CloseLogger closes the log file if a file logger is used
-func (l *FileLogger) CloseLogger() error {
-	if l.logFile != nil {
-		return l.logFile.Close()
+	switch appEnv {
+	case "production":
+		level.Set(slog.LevelInfo)
+	case "development":
+		level.Set(slog.LevelDebug)
 	}
-	return nil
-}
 
-// CloseLogger does not close anything
-func (l *ConsoleLogger) CloseLogger() error {
-	return nil
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
 }

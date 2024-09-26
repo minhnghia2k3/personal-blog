@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"github.com/minhnghia2k3/personal-blog/internal/config"
+	"log"
 	"net/http"
 	"time"
 )
@@ -26,6 +27,6 @@ func (app *Application) Serve(handler http.Handler) error {
 		WriteTimeout: 30 * time.Second,
 	}
 
-	fmt.Printf("Listening on port :%d\n", app.Config.Port)
+	log.Printf("Listening on port :%d\n", app.Config.Port)
 	return srv.ListenAndServe()
 }

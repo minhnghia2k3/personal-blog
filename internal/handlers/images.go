@@ -19,9 +19,9 @@ func NewImageHandler() *ImageHandler {
 
 // UploadHandler creates a new file in the images directory and copies the incoming file to this new file.
 func (h *ImageHandler) UploadHandler(w http.ResponseWriter, r *http.Request) {
-	const MAX_UPLOAD_SIZE = 10 << 20 // Set the max upload size to 10 MB
-	r.Body = http.MaxBytesReader(w, r.Body, MAX_UPLOAD_SIZE)
-	if err := r.ParseMultipartForm(MAX_UPLOAD_SIZE); err != nil {
+	const MaxUploadSize = 10 << 20 // Set the max upload size to 10 MB
+	r.Body = http.MaxBytesReader(w, r.Body, MaxUploadSize)
+	if err := r.ParseMultipartForm(MaxUploadSize); err != nil {
 		http.Error(w, "The uploaded file is too big. Please choose a file that's less than 10MB in size", http.StatusBadRequest)
 		return
 	}
